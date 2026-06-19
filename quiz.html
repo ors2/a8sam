@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>Quiz</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  color: white;
+  text-align: center;
+  background: url("dth.jpg") no-repeat center center fixed;
+  background-size: cover;
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.65);
+}
+
+#question{
+  font-size:24px;
+  margin:20px;
+  padding:18px;
+  background:rgba(10,10,10,0.95);
+  border:2px solid #3b0a0a;
+  display:inline-block;
+  border-radius:12px;
+  position:relative;
+}
+
+.doors{
+  display:flex;
+  justify-content:center;
+  gap:20px;
+  margin-top:20px;
+  position:relative;
+}
+
+.door{
+  width:170px;
+  height:230px;
+  background:rgba(10,10,10,0.95);
+  border:2px solid #3b0a0a;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+#timerBox{
+  margin-top:20px;
+  font-size:24px;
+  position:relative;
+}
+
+.footer{
+  position:fixed;
+  bottom:10px;
+  left:50%;
+  transform:translateX(-50%);
+}
+</style>
+</head>
+
+<body>
+
+<h1>Quiz</h1>
+
+<div id="question"></div>
+<div class="doors" id="doors"></div>
+<div id="timerBox">0:00</div>
+
+<div class="footer">by 0xRaph</div>
+
+<script>
+
+// 👇 نقرأ رقم القسم من الرابط
+const urlParams = new URLSearchParams(window.location.search);
+const chapter = urlParams.get("chapter");
+
+// 🔥 كل الأقسام هنا
+const allQuestions = {
+
+1: [
+{
+q: "ثوب : جسم",
+options: ["قبعة : رأس", "قدم : حذاء", "قماش : خياط", "خشب : طاولة"],
+correct: "قبعة : رأس"
+},
+{
+q: "شظف : رخاء",
+options: ["إذاعة : تلفاز", "بذل : عطاء", "بذور : جذور", "قسوة : لين"],
+correct: "قسوة : لين"
+}
+],
+
+2: [
+{
+q: "قلم : كتابة",
+options: ["تعليم : معلم", "رسام : رسم", "حصاد : حصادة", "تحذير : محذر"],
+correct: "رسام : رسم"
+}
+]
+
+// 👇 بعدين نكمل 3 - 225 بنفس الشكل
+};
+
+// 🔥 نجيب أسئلة القسم الحالي
+const questions = allQuestions[chapter] || [];
+
+let i = 0;
+
+function show(){
+let q = questions[i];
+
+if(!q){
+document.getElementById("question").innerText = "انتهى القسم 🎉";
+document.getElementById("doors").innerHTML = "";
+return;
+}
+
+document.getElementById("question").innerText = q.q;
+
+document.getElementById("doors").innerHTML =
+q.options.map(o=>`
+<div class="door" onclick="next('${o}')">${o}</div>
+`).join("");
+}
+
+function next(ans){
+i++;
+show();
+}
+
+show();
+
+</script>
+
+</body>
+</html>
