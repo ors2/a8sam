@@ -1,4 +1,19 @@
-<h1>لوحة الاختبارات</h1>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>لوحة الاختبارات</title>
+<style>
+body { font-family: Arial; background:#111; color:white; text-align:center; }
+.card { background:#222; margin:10px; padding:10px; border-radius:10px; }
+a { color:white; text-decoration:none; display:block; }
+input { padding:10px; width:80%; margin:20px; }
+</style>
+</head>
+
+<body>
+
+<h1>📚 لوحة الاختبارات</h1>
 
 <input id="search" placeholder="ابحث عن قسم..." />
 
@@ -7,27 +22,34 @@
 <script>
 const chapters = [];
 
-for (let i = 1; i <= 225; i++) {
+// نسوي 225 قسم تلقائي
+for(let i=1;i<=225;i++){
   chapters.push({
-    id: i,
-    title: "القسم " + i,
-    link: "chapter" + i + ".html"
+    id:i,
+    title:"القسم " + i
   });
 }
 
-function render(list){
+function render(data){
   document.getElementById("list").innerHTML =
-    list.map(c => `
-      <div style="padding:10px;margin:10px;background:#222;color:white">
-        <a style="color:white" href="${c.link}">${c.title}</a>
+    data.map(c=>`
+      <div class="card">
+        <a href="#" onclick="openChapter(${c.id})">${c.title}</a>
       </div>
     `).join("");
+}
+
+function openChapter(id){
+  alert("هنا بيفتح اختبار القسم رقم " + id);
+  // لاحقًا نحط أسئلة كل قسم هنا
 }
 
 render(chapters);
 
 document.getElementById("search").oninput = function(){
-  const val = this.value;
-  render(chapters.filter(c => c.title.includes(val)));
+  render(chapters.filter(c=>c.title.includes(this.value)));
 };
 </script>
+
+</body>
+</html>
