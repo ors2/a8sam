@@ -66,11 +66,12 @@ body::before {
   align-items: center;
   justify-content: center;
   transition: 0.3s;
-  font-size: 18px;
-  padding: 10px;
+  font-size: 20px;
 }
 
-.door:hover { transform: scale(1.07); }
+.door:hover {
+  transform: scale(1.07);
+}
 
 .correct {
   background: #14532d !important;
@@ -84,7 +85,7 @@ body::before {
 
 #timerBox {
   font-size: 26px;
-  margin: 30px auto 10px;
+  margin: 110px auto 10px;
   padding: 14px 22px;
   background: rgba(10,10,10,0.95);
   border: 2px solid #3b0a0a;
@@ -192,7 +193,6 @@ correct: "البيئة تتأثر بالمطر"
 }
 ];
 
-// ====== تشغيل ======
 let current = 0;
 let locked = false;
 let startTime = Date.now();
@@ -214,6 +214,7 @@ function startTimer(){
 
 function show(){
   locked = false;
+
   let q = questions[current];
 
   if(!q){
