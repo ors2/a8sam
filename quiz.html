@@ -69,21 +69,17 @@ body::before {
   font-size: 20px;
 }
 
-/* hover مثل الأصل */
 .door:hover {
   transform: scale(1.07);
 }
 
-/* ✅ صح */
+/* 🔥 نفس نظامك القديم (بدون تغييرات فلسفية) */
 .correct {
-  border: 3px solid #22c55e !important;
-  box-shadow: 0 0 20px #22c55e;
+  border: 2px solid #22c55e !important;
 }
 
-/* ❌ خطأ */
 .wrong {
-  border: 3px solid #ef4444 !important;
-  box-shadow: 0 0 20px #ef4444;
+  border: 2px solid #ef4444 !important;
 }
 
 #timerBox {
@@ -119,10 +115,8 @@ body::before {
 
 <script>
 
-// 🔥 القسم من الرابط
 const chapter = new URLSearchParams(window.location.search).get("chapter");
 
-// الأسئلة
 const allQuestions = {
 1: [
 {
@@ -139,13 +133,13 @@ correct: "قسوة : لين"
 };
 
 let questions = allQuestions[chapter] || [];
-let current = 0;
+let i = 0;
 let locked = false;
 
-/* 🔥 TIMER */
-let start = Date.now();
+/* ⏱️ نفس التايمر البسيط */
+let startTime = Date.now();
 setInterval(()=>{
-let sec = Math.floor((Date.now()-start)/1000);
+let sec = Math.floor((Date.now()-startTime)/1000);
 let m = Math.floor(sec/60);
 let s = sec%60;
 document.getElementById("timerBox").innerText =
@@ -155,7 +149,7 @@ document.getElementById("timerBox").innerText =
 function show(){
 locked = false;
 
-let q = questions[current];
+let q = questions[i];
 
 if(!q){
 document.getElementById("question").innerText = "انتهى القسم 🎉";
@@ -183,20 +177,16 @@ function check(opt, door, correct){
 if(locked) return;
 locked = true;
 
-// صح
 if(opt === correct){
 door.classList.add("correct");
-}
-// خطأ
-else{
+}else{
 door.classList.add("wrong");
 }
 
-// ننتظر ونكمل
 setTimeout(()=>{
-current++;
+i++;
 show();
-},600);
+},500);
 }
 
 show();
