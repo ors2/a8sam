@@ -38,6 +38,10 @@ body::before {
   100% { background-position: 200% 50%; }
 }
 
+.subtitle {
+  color: #ccc;
+}
+
 #question {
   font-size: 24px;
   margin: 20px auto;
@@ -73,13 +77,14 @@ body::before {
   transform: scale(1.07);
 }
 
-/* 🔥 نفس نظامك القديم (بدون تغييرات فلسفية) */
 .correct {
-  border: 2px solid #22c55e !important;
+  background: #14532d !important;
+  border-color: #22c55e !important;
 }
 
 .wrong {
-  border: 2px solid #ef4444 !important;
+  background: #7f1d1d !important;
+  border-color: #ef4444 !important;
 }
 
 #timerBox {
@@ -99,6 +104,7 @@ body::before {
   transform: translateX(-50%);
   font-size: 22px;
   font-weight: bold;
+  color: white;
 }
 </style>
 </head>
@@ -106,6 +112,7 @@ body::before {
 <body>
 
 <h1 class="quiz-title">Quiz</h1>
+<div class="subtitle">إكمال الجمل</div>
 
 <div id="question"></div>
 <div class="doors" id="doors"></div>
@@ -118,6 +125,7 @@ body::before {
 const chapter = new URLSearchParams(window.location.search).get("chapter");
 
 const allQuestions = {
+
 1: [
 {
 q: "ثوب : جسم",
@@ -128,15 +136,72 @@ correct: "قبعة : رأس"
 q: "شظف : رخاء",
 options: ["إذاعة : تلفاز", "بذل : عطاء", "بذور : جذور", "قسوة : لين"],
 correct: "قسوة : لين"
+},
+{
+q: "قلم : كتابة",
+options: ["تعليم : معلم", "رسام : رسم", "حصاد : حصادة", "تحذير : محذر"],
+correct: "رسام : رسم"
+},
+{
+q: "حصان : مضمار",
+options: ["طائرة : سماء", "سفينة : بحر", "قطار : سكة", "سيارة : طريق"],
+correct: "قطار : سكة"
+},
+{
+q: "إذا جلست للناس فكن ....... لقلبك ولنفسك ولا يغرنك اجتماعهم عليك فإنهم يراقبون ظاهرك والله تعالى ....... باطنك.",
+options: ["مقلباً - يبصر", "واعظاً - يراقب", "مجتهداً - يرى", "مستخدماً - يشاهد"],
+correct: "واعظاً - يراقب"
+},
+{
+q: "الطلاقة ....... ملكة تعين الإنسان على حسن ....... والإقناع.",
+options: ["الفكرية - الاستماع", "اللفظية - التعبير", "الشعرية - التواري", "الحسية - الاستنطاق"],
+correct: "اللفظية - التعبير"
+},
+{
+q: "أسوأ الناس من إذا هجرته سكت وإذا مدحته خجل.",
+options: ["أسوأ", "هجرته", "سكت", "خجل"],
+correct: "أسوأ"
+},
+{
+q: "لا تجعل الغضب مانعا للانتقام",
+options: ["تجعل", "الغضب", "مانعا", "للانتقام"],
+correct: "مانعا"
+},
+{
+q: "يفهم من النص أن يكون الإنسان :",
+options: ["مستقلا", "تابعا", "ناجحا", "متغيراً"],
+correct: "مستقلا"
+},
+{
+q: "يفهم من الفقرتين (1) و (٢) أن عدد ضحايا الزلزال يرتبط",
+options: ["بقوة الزلزال", "بتاريخ وقوعه", "بنوع المكان", "بتعدد حدوثه"],
+correct: "بنوع المكان"
+},
+{
+q: "تعد جملة سيشعر المصاب بالسكري ... في النص:",
+options: ["سبباً لما قبلها", "نتيجة لما قبلها", "تأكيداً لما بعدها", "تمهيدا لما بعدها"],
+correct: "نتيجة لما قبلها"
+},
+{
+q: "نستنبط من النص أن تقنية غمر الأرض تؤدي إلى زيادة",
+options: ["هطول الأمطار", "المياه المستفاد منها", "المياه الجوفية المستهلكة", "المياه السطحية الموفرة"],
+correct: "المياه المستفاد منها"
+},
+{
+q: "يعتبر المطر الحمضي من أخطر مشكلات البيئة التي تواجهها ويؤثر على قطاع كبير منها",
+options: ["مشكلات البيئة تواجه عقبات", "المطر له مخاطر", "المطر جزء من مشكلات البيئة", "البيئة تتأثر بالمطر"],
+correct: "البيئة تتأثر بالمطر"
 }
+
 ]
+
 };
 
 let questions = allQuestions[chapter] || [];
-let i = 0;
+let current = 0;
 let locked = false;
 
-/* ⏱️ نفس التايمر البسيط */
+/* timer */
 let startTime = Date.now();
 setInterval(()=>{
 let sec = Math.floor((Date.now()-startTime)/1000);
@@ -149,7 +214,7 @@ document.getElementById("timerBox").innerText =
 function show(){
 locked = false;
 
-let q = questions[i];
+let q = questions[current];
 
 if(!q){
 document.getElementById("question").innerText = "انتهى القسم 🎉";
@@ -184,7 +249,7 @@ door.classList.add("wrong");
 }
 
 setTimeout(()=>{
-i++;
+current++;
 show();
 },500);
 }
