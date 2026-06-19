@@ -10,82 +10,120 @@ body {
   font-family: Arial;
   color: white;
   text-align: center;
+  overflow-x: hidden;
   background: url("dth.jpg") no-repeat center center fixed;
   background-size: cover;
 }
 
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.65);
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  z-index: -1;
 }
 
-#question{
-  font-size:24px;
-  margin:20px;
-  padding:18px;
-  background:rgba(10,10,10,0.95);
-  border:2px solid #3b0a0a;
-  display:inline-block;
-  border-radius:12px;
-  position:relative;
+.quiz-title {
+  font-size: 42px;
+  font-weight: bold;
+  background: linear-gradient(90deg, #ef4444, #000000, #ef4444);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: moveColor 3s linear infinite;
 }
 
-.doors{
-  display:flex;
-  justify-content:center;
-  gap:20px;
-  margin-top:20px;
-  position:relative;
+@keyframes moveColor {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
 }
 
-.door{
-  width:170px;
-  height:230px;
-  background:rgba(10,10,10,0.95);
-  border:2px solid #3b0a0a;
-  border-radius:10px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
+#question {
+  font-size: 24px;
+  margin: 20px auto;
+  padding: 18px;
+  background: rgba(10,10,10,0.95);
+  border: 2px solid #3b0a0a;
+  border-radius: 12px;
+  display: inline-block;
 }
 
-#timerBox{
-  margin-top:20px;
-  font-size:24px;
-  position:relative;
+.doors {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin-top: 25px;
 }
 
-.footer{
-  position:fixed;
-  bottom:10px;
-  left:50%;
-  transform:translateX(-50%);
+.door {
+  width: 170px;
+  height: 230px;
+  background: rgba(10,10,10,0.95);
+  border: 2px solid #3b0a0a;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+  font-size: 20px;
+}
+
+/* hover مثل الأصل */
+.door:hover {
+  transform: scale(1.07);
+}
+
+/* ✅ صح */
+.correct {
+  border: 3px solid #22c55e !important;
+  box-shadow: 0 0 20px #22c55e;
+}
+
+/* ❌ خطأ */
+.wrong {
+  border: 3px solid #ef4444 !important;
+  box-shadow: 0 0 20px #ef4444;
+}
+
+#timerBox {
+  font-size: 26px;
+  margin: 110px auto 10px;
+  padding: 14px 22px;
+  background: rgba(10,10,10,0.95);
+  border: 2px solid #3b0a0a;
+  border-radius: 12px;
+  display: inline-block;
+}
+
+.footer {
+  position: fixed;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 22px;
+  font-weight: bold;
 }
 </style>
 </head>
 
 <body>
 
-<h1>Quiz</h1>
+<h1 class="quiz-title">Quiz</h1>
 
 <div id="question"></div>
 <div class="doors" id="doors"></div>
-<div id="timerBox">0:00</div>
+<div id="timerBox">الوقت: 0:00</div>
 
-<div class="footer">by 0xRaph</div>
+<div class="footer">precisely</div>
 
 <script>
 
-// 👇 نقرأ رقم القسم من الرابط
-const urlParams = new URLSearchParams(window.location.search);
-const chapter = urlParams.get("chapter");
+// 🔥 القسم من الرابط
+const chapter = new URLSearchParams(window.location.search).get("chapter");
 
-// 🔥 كل الأقسام هنا
+// الأسئلة
 const allQuestions = {
-
 1: [
 {
 q: "ثوب : جسم",
@@ -97,26 +135,27 @@ q: "شظف : رخاء",
 options: ["إذاعة : تلفاز", "بذل : عطاء", "بذور : جذور", "قسوة : لين"],
 correct: "قسوة : لين"
 }
-],
-
-2: [
-{
-q: "قلم : كتابة",
-options: ["تعليم : معلم", "رسام : رسم", "حصاد : حصادة", "تحذير : محذر"],
-correct: "رسام : رسم"
-}
 ]
-
-// 👇 بعدين نكمل 3 - 225 بنفس الشكل
 };
 
-// 🔥 نجيب أسئلة القسم الحالي
-const questions = allQuestions[chapter] || [];
+let questions = allQuestions[chapter] || [];
+let current = 0;
+let locked = false;
 
-let i = 0;
+/* 🔥 TIMER */
+let start = Date.now();
+setInterval(()=>{
+let sec = Math.floor((Date.now()-start)/1000);
+let m = Math.floor(sec/60);
+let s = sec%60;
+document.getElementById("timerBox").innerText =
+"الوقت: " + m + ":" + (s<10?"0"+s:s);
+},1000);
 
 function show(){
-let q = questions[i];
+locked = false;
+
+let q = questions[current];
 
 if(!q){
 document.getElementById("question").innerText = "انتهى القسم 🎉";
@@ -126,15 +165,38 @@ return;
 
 document.getElementById("question").innerText = q.q;
 
-document.getElementById("doors").innerHTML =
-q.options.map(o=>`
-<div class="door" onclick="next('${o}')">${o}</div>
-`).join("");
+let box = document.getElementById("doors");
+box.innerHTML = "";
+
+q.options.forEach(opt=>{
+let d = document.createElement("div");
+d.className = "door";
+d.innerText = opt;
+
+d.onclick = ()=>check(opt, d, q.correct);
+
+box.appendChild(d);
+});
 }
 
-function next(ans){
-i++;
+function check(opt, door, correct){
+if(locked) return;
+locked = true;
+
+// صح
+if(opt === correct){
+door.classList.add("correct");
+}
+// خطأ
+else{
+door.classList.add("wrong");
+}
+
+// ننتظر ونكمل
+setTimeout(()=>{
+current++;
 show();
+},600);
 }
 
 show();
