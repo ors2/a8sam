@@ -2,137 +2,253 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>Quiz System</title>
+<title>Quiz</title>
 
 <style>
-body{
-  font-family:Arial;
-  background:#111;
-  color:white;
-  text-align:center;
+body {
+  margin: 0;
+  font-family: Arial;
+  color: white;
+  text-align: center;
+  overflow-x: hidden;
+  background: url("dth.jpg") no-repeat center center fixed;
+  background-size: cover;
 }
 
-.card{
-  background:#222;
-  margin:10px auto;
-  padding:12px;
-  width:80%;
-  border-radius:10px;
-  cursor:pointer;
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  z-index: -1;
 }
 
-.door{
-  background:#222;
-  margin:10px;
-  padding:15px;
-  border-radius:10px;
-  cursor:pointer;
+.quiz-title {
+  font-size: 42px;
+  font-weight: bold;
+  background: linear-gradient(90deg, #ef4444, #000000, #ef4444);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: moveColor 3s linear infinite;
 }
 
-#quizBox{display:none;}
-#listBox{display:block;}
+@keyframes moveColor {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
 
-.correct{background:green !important;}
-.wrong{background:red !important;}
+#question {
+  font-size: 24px;
+  margin: 20px auto;
+  padding: 18px;
+  background: rgba(10,10,10,0.95);
+  border: 2px solid #3b0a0a;
+  border-radius: 12px;
+  display: inline-block;
+}
+
+.doors {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin-top: 25px;
+}
+
+.door {
+  width: 170px;
+  height: 230px;
+  background: rgba(10,10,10,0.95);
+  border: 2px solid #3b0a0a;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+  font-size: 18px;
+  padding: 10px;
+}
+
+.door:hover { transform: scale(1.07); }
+
+.correct {
+  background: #14532d !important;
+  border-color: #22c55e !important;
+}
+
+.wrong {
+  background: #7f1d1d !important;
+  border-color: #ef4444 !important;
+}
+
+#timerBox {
+  font-size: 26px;
+  margin: 30px auto 10px;
+  padding: 14px 22px;
+  background: rgba(10,10,10,0.95);
+  border: 2px solid #3b0a0a;
+  border-radius: 12px;
+  display: inline-block;
+}
+
+.footer {
+  position: fixed;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 22px;
+  font-weight: bold;
+  color: white;
+}
 </style>
 </head>
 
 <body>
 
-<h1>📚 الاختبارات</h1>
+<h1 class="quiz-title">Quiz</h1>
 
-<div id="listBox"></div>
-
-<div id="quizBox">
-  <h2 id="q"></h2>
-  <div id="answers"></div>
-  <button onclick="back()">رجوع</button>
+<div id="gameScreen">
+  <div id="question"></div>
+  <div class="doors" id="doors"></div>
+  <div id="timerBox">الوقت: 0:00</div>
 </div>
+
+<div class="footer">by 0xRaph</div>
 
 <script>
 
-// 225 قسم جاهز
-const chapters = [];
-for(let i=1;i<=225;i++){
-  chapters.push(i);
+// ====== الأسئلة (القسم 1) ======
+const questions = [
+{
+q: "ثوب : جسم",
+options: ["قبعة : رأس", "قدم : حذاء", "قماش : خياط", "خشب : طاولة"],
+correct: "قبعة : رأس"
+},
+{
+q: "شظف : رخاء",
+options: ["إذاعة : تلفاز", "بذل : عطاء", "بذور : جذور", "قسوة : لين"],
+correct: "قسوة : لين"
+},
+{
+q: "قلم : كتابة",
+options: ["تعليم : معلم", "رسام : رسم", "حصاد : حصادة", "تحذير : محذر"],
+correct: "رسام : رسم"
+},
+{
+q: "حصان : مضمار",
+options: ["طائرة : سماء", "سفينة : بحر", "قطار : سكة", "سيارة : طريق"],
+correct: "قطار : سكة"
+},
+{
+q: "إذا جلست للناس فكن ....... لقلبك ولنفسك ولا يغرنك اجتماعهم عليك فإنهم يراقبون ظاهرك والله تعالى ....... باطنك.",
+options: ["مقلباً - يبصر", "واعظاً - يراقب", "مجتهداً - يرى", "مستخدماً - يشاهد"],
+correct: "واعظاً - يراقب"
+},
+{
+q: "الطلاقة ....... ملكة تعين الإنسان على حسن ....... والإقناع.",
+options: ["الفكرية - الاستماع", "اللفظية - التعبير", "الشعرية - التواري", "الحسية - الاستنطاق"],
+correct: "اللفظية - التعبير"
+},
+{
+q: "أسوأ الناس من إذا هجرته سكت وإذا مدحته خجل.",
+options: ["أسوأ", "هجرته", "سكت", "خجل"],
+correct: "أسوأ"
+},
+{
+q: "لا تجعل الغضب مانعا للانتقام",
+options: ["تجعل", "الغضب", "مانعا", "للانتقام"],
+correct: "مانعا"
+},
+{
+q: "يفهم من النص أن يكون الإنسان :",
+options: ["مستقلا", "تابعا", "ناجحا", "متغيراً"],
+correct: "مستقلا"
+},
+{
+q: "يفهم من الفقرتين (1) و (٢) أن عدد ضحايا الزلزال يرتبط",
+options: ["بقوة الزلزال", "بتاريخ وقوعه", "بنوع المكان", "بتعدد حدوثه"],
+correct: "بنوع المكان"
+},
+{
+q: 'تعد جملة "سيشعر المصاب بالسكري ..." في النص:',
+options: ["سبباً لما قبلها", "نتيجة لما قبلها", "تأكيداً لما بعدها", "تمهيدا لما بعدها"],
+correct: "نتيجة لما قبلها"
+},
+{
+q: 'نستنبط من النص أن تقنية "غمر الأرض" تؤدي إلى زيادة',
+options: ["هطول الأمطار", "المياه المستفاد منها", "المياه الجوفية المستهلكة", "المياه السطحية الموفرة"],
+correct: "المياه المستفاد منها"
+},
+{
+q: "يعتبر المطر الحمضي من أخطر مشكلات البيئة التي تواجهها ، ويؤثر على قطاع كبير منها",
+options: [
+"مشكلات البيئة تواجه عقبات",
+"المطر له مخاطر",
+"المطر جزء من مشكلات البيئة",
+"البيئة تتأثر بالمطر"
+],
+correct: "البيئة تتأثر بالمطر"
+}
+];
+
+// ====== تشغيل ======
+let current = 0;
+let locked = false;
+let startTime = Date.now();
+let timer;
+
+function startTimer(){
+  clearInterval(timer);
+  startTime = Date.now();
+
+  timer = setInterval(()=>{
+    let sec = Math.floor((Date.now()-startTime)/1000);
+    let min = Math.floor(sec/60);
+    let rem = sec%60;
+
+    document.getElementById("timerBox").innerText =
+      "الوقت: "+min+":"+(rem<10?"0"+rem:rem);
+  },1000);
 }
 
-// مثال أسئلة (هنا تحط أسئلة كل قسم لاحقًا)
-const questions = {
-  1: [
-    {
-      q:"ثوب : جسم",
-      options:["قبعة : رأس","قدم : حذاء","قماش : خياط","خشب : طاولة"],
-      correct:"قبعة : رأس"
-    }
-  ],
-  2: [
-    {
-      q:"قلم : كتابة",
-      options:["تعليم : معلم","رسام : رسم","حصاد : حصادة","تحذير : محذر"],
-      correct:"رسام : رسم"
-    }
-  ]
-};
-
-let currentChapter = null;
-let index = 0;
-
-function renderChapters(){
-  document.getElementById("listBox").innerHTML =
-    chapters.map(i=>`
-      <div class="card" onclick="openChapter(${i})">
-        📘 القسم ${i}
-      </div>
-    `).join("");
-}
-
-function openChapter(id){
-  currentChapter = id;
-  index = 0;
-
-  document.getElementById("listBox").style.display="none";
-  document.getElementById("quizBox").style.display="block";
-
-  showQ();
-}
-
-function showQ(){
-  let q = questions[currentChapter]?.[index];
+function show(){
+  locked = false;
+  let q = questions[current];
 
   if(!q){
-    document.getElementById("q").innerText="انتهى القسم";
-    document.getElementById("answers").innerHTML="";
+    document.getElementById("question").innerText = "انتهى القسم 🎉";
+    document.getElementById("doors").innerHTML = "";
+    clearInterval(timer);
     return;
   }
 
-  document.getElementById("q").innerText = q.q;
+  document.getElementById("question").innerText = q.q;
 
-  document.getElementById("answers").innerHTML =
+  document.getElementById("doors").innerHTML =
     q.options.map(o=>`
       <div class="door" onclick="check('${o}')">${o}</div>
     `).join("");
 }
 
-function check(ans){
-  let q = questions[currentChapter][index];
+function check(opt){
+  if(locked) return;
+  locked = true;
 
-  if(ans === q.correct){
+  let q = questions[current];
+
+  if(opt === q.correct){
     alert("✔ صحيح");
-  }else{
+  } else {
     alert("✖ خطأ");
   }
 
-  index++;
-  showQ();
+  current++;
+  show();
 }
 
-function back(){
-  document.getElementById("listBox").style.display="block";
-  document.getElementById("quizBox").style.display="none";
-}
-
-renderChapters();
+startTimer();
+show();
 
 </script>
 
