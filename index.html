@@ -2,53 +2,138 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>لوحة الاختبارات</title>
+<title>Quiz System</title>
+
 <style>
-body { font-family: Arial; background:#111; color:white; text-align:center; }
-.card { background:#222; margin:10px; padding:10px; border-radius:10px; }
-a { color:white; text-decoration:none; display:block; }
-input { padding:10px; width:80%; margin:20px; }
+body{
+  font-family:Arial;
+  background:#111;
+  color:white;
+  text-align:center;
+}
+
+.card{
+  background:#222;
+  margin:10px auto;
+  padding:12px;
+  width:80%;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+.door{
+  background:#222;
+  margin:10px;
+  padding:15px;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+#quizBox{display:none;}
+#listBox{display:block;}
+
+.correct{background:green !important;}
+.wrong{background:red !important;}
 </style>
 </head>
 
 <body>
 
-<h1>📚 لوحة الاختبارات</h1>
+<h1>📚 الاختبارات</h1>
 
-<input id="search" placeholder="ابحث عن قسم..." />
+<div id="listBox"></div>
 
-<div id="list"></div>
+<div id="quizBox">
+  <h2 id="q"></h2>
+  <div id="answers"></div>
+  <button onclick="back()">رجوع</button>
+</div>
 
 <script>
-const chapters = [];
 
-// نسوي 225 قسم تلقائي
+// 225 قسم جاهز
+const chapters = [];
 for(let i=1;i<=225;i++){
-  chapters.push({
-    id:i,
-    title:"القسم " + i
-  });
+  chapters.push(i);
 }
 
-function render(data){
-  document.getElementById("list").innerHTML =
-    data.map(c=>`
-      <div class="card">
-        <a href="#" onclick="openChapter(${c.id})">${c.title}</a>
+// مثال أسئلة (هنا تحط أسئلة كل قسم لاحقًا)
+const questions = {
+  1: [
+    {
+      q:"ثوب : جسم",
+      options:["قبعة : رأس","قدم : حذاء","قماش : خياط","خشب : طاولة"],
+      correct:"قبعة : رأس"
+    }
+  ],
+  2: [
+    {
+      q:"قلم : كتابة",
+      options:["تعليم : معلم","رسام : رسم","حصاد : حصادة","تحذير : محذر"],
+      correct:"رسام : رسم"
+    }
+  ]
+};
+
+let currentChapter = null;
+let index = 0;
+
+function renderChapters(){
+  document.getElementById("listBox").innerHTML =
+    chapters.map(i=>`
+      <div class="card" onclick="openChapter(${i})">
+        📘 القسم ${i}
       </div>
     `).join("");
 }
 
 function openChapter(id){
-  alert("هنا بيفتح اختبار القسم رقم " + id);
-  // لاحقًا نحط أسئلة كل قسم هنا
+  currentChapter = id;
+  index = 0;
+
+  document.getElementById("listBox").style.display="none";
+  document.getElementById("quizBox").style.display="block";
+
+  showQ();
 }
 
-render(chapters);
+function showQ(){
+  let q = questions[currentChapter]?.[index];
 
-document.getElementById("search").oninput = function(){
-  render(chapters.filter(c=>c.title.includes(this.value)));
-};
+  if(!q){
+    document.getElementById("q").innerText="انتهى القسم";
+    document.getElementById("answers").innerHTML="";
+    return;
+  }
+
+  document.getElementById("q").innerText = q.q;
+
+  document.getElementById("answers").innerHTML =
+    q.options.map(o=>`
+      <div class="door" onclick="check('${o}')">${o}</div>
+    `).join("");
+}
+
+function check(ans){
+  let q = questions[currentChapter][index];
+
+  if(ans === q.correct){
+    alert("✔ صحيح");
+  }else{
+    alert("✖ خطأ");
+  }
+
+  index++;
+  showQ();
+}
+
+function back(){
+  document.getElementById("listBox").style.display="block";
+  document.getElementById("quizBox").style.display="none";
+}
+
+renderChapters();
+
 </script>
 
 </body>
